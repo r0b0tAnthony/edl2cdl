@@ -93,7 +93,6 @@ else:
     print "            Color correction IDs (ccid) are assinged as the EDL event tapenames"
     sys.exit(1)
 
-camre = re.compile(r"[*]\sFROM\sCLIP\sNAME:\s+.*(?P<name>[A-Z][0-9]{3}[_]?C[0-9]{3})")
 camre = re.compile(r"\*\s?FROM\sCLIP\sNAME:\s+.*(?P<name>[A-Z][0-9]{3}[_]?C[0-9]{3})")
 camre0 = re.compile(r"\*\sFROM\sCLIP\sNAME:\s+(?P<name>.{63})")
 camre1 = re.compile(r"[*]\s(?P<name>.*)")
