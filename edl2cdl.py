@@ -96,6 +96,7 @@ else:
 camre = re.compile(r"\*\s?FROM\sCLIP\sNAME:\s+.*(?P<name>[A-Z][0-9]{3}[_]?C[0-9]{3})")
 camre0 = re.compile(r"\*\sFROM\sCLIP\sNAME:\s+(?P<name>.{63})")
 camre1 = re.compile(r"[*]\s(?P<name>.*)")
+#Greedier FROM CLIP NAME Regex
 camre3 = re.compile(r"\*\s?FROM\sCLIP\sNAME:\s+(?P<name>[A-Z0-9_-]+)")
 input_desc, viewing_desc = None, "EDL2CDL script by Walter Arrighetti"
 tapere = re.compile(r"\*\s?FROM\sCLIP\sNAME:\s+(?P<name>[A-Za-z0-9-_,.]|\s{8,32})")
