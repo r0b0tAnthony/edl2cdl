@@ -165,8 +165,6 @@ for n in range(len(EDL)):
             tapename, CDLevent = None, False
     elif camre3.match(line):
         CDLevent, L = True, camre3.match(line)
-        print CDLevent
-        print L
         if thisCDL:
             writeCDL(tapename, thisCDL, thisSAT)
             thisCDL, thisSAT = None, 0
