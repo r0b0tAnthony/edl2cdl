@@ -10,6 +10,20 @@ This tool is for converting color-correction metadata for advanced theatrical/te
 Since the original ClipName name is transformed into a CCCid and the on-set color-correction usually includes just one version/grade per clip shot, no multiple CDLs are extracted from a single ClipName/TapeName.
 The only parameter that can be passed is either `--ccc` (*default* if not explicitly defined) or `--cdl` or `--cc` to specify the corresponding output format. Other than that a first mandatory argument is the pathname of the input EDL file. Optionally a foldername or a filename can be specified as argument (the script intelligently parses the output pathname guessing its use according to different output format). Individual EDL/CC files are generated in a separate folder (that keeps the EDL name, without extension, by default); the single CCC file is by default generated in the same folder (and with the same name) of the EDL file.
 
+## Usage
+
+### To Create A Color Correction Collection, a group of CCs in a single file.
+
+`python edl2cdl.py file.edl path/to/file.ccc`
+
+### To Create Individual CC Files
+
+`python edl2cdl.py file.edl path/to/folder --cc`
+
+This will name each CC file after the corresponding Clip Name in the EDL.
+
+### To Create Individual CDL Files
+`python edl2cdl.py file.edl path/to/folder --cdl`
 
 ## Details on ASC CDL
 Each “color decision”, i.e. a so-called “primary” color grading operator mimicking 35mm film color-timing and telecine operations and affecting the whole frame or sequence of frames, is represented by a 10-tuple of floating point values divided in 3+3+3+1 numbers: (*s*R, *s*G, *s*B), (*o*R, *o*G, *o*B), (*p*R, *p*G, *p*B) and *S*.
