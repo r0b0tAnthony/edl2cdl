@@ -182,6 +182,7 @@ def main(argv):
                 tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
                 continue
 
+    edlInput.close()
     from pprint import pprint
     pprint(CCC)
 
