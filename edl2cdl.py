@@ -89,7 +89,7 @@ def appendCCXML(ccID, slope, offset, power, sat, rootElement = None):
 
     return ccElement
 
-def main(argv):
+def main():
     args = getArgs()
 
     output = os.path.abspath(args.output)
@@ -240,5 +240,4 @@ def main(argv):
         print " * %d individual %s(s) written in folder \"%s\"." % (len(CCC), args.format, output)
 
 if __name__ == "__main__":
-    #Pass Along everything but this very script
-    main(sys.argv)
+    main()
