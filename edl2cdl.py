@@ -97,9 +97,10 @@ def main(argv):
         #Greedier FROM CLIP NAME Regex
         camre3 = re.compile(r"\*\s?FROM\sCLIP\sNAME:\s+(?P<name>[A-Z0-9_\-]+)")
         tapere = re.compile(r"\*\sFROM\sCLIP\sNAME:\s+(?P<name>[A-Za-z0-9-_,.]|\s{8,32})")
-
-        for line in edlInput.readlines():
-            line = line.strip()
+        edlLines = edlInput.readlines()
+        lenEdlLines = len(edlLines)
+        for n in range(lenEdlLines):
+            line = edlLines[n].strip()
             if line[0] != '*':
                 continue
             if camre.match(line):
@@ -110,9 +111,9 @@ def main(argv):
                 tapename = L.group("name")
                 if tapename in IDs:
                     tapename, CDLevent = None, False
-            elif camre0.match(line) and n < len(EDL) - 1 and camre1.match(EDL[n + 1]):
+            elif camre0.match(line) and n < lenEdlLines - 1 and camre1.match(edlLines[n + 1]):
                 n += 1
-                line = line + camre1.match(EDL[n]).group("name")
+                line = line + camre1.match(edlLines[n]).group("name")
                 L = camre.match(line)
                 if not L:
                     writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
