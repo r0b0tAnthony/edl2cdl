@@ -21,6 +21,8 @@
 #!/usr/bin/env python
 _version = "2.0"
 import os,re, sys, argparse, errno
+from xml.etree.ElementTree import Element, SubElement, Comment, tostring
+from ElementTree_pretty import prettify
 
 def writeCDL(CCC, IDs, CCCid, SOPnode, SATnode):
     CCC.append({
@@ -68,17 +70,24 @@ def cdl1Parse(reMatches):
     return (tuple(map(float, (reMatches.group("sR"), reMatches.group("sG"), reMatches.group("sB")))), tuple(map(float, (reMatches.group(
         "oR"), reMatches.group("oG"), reMatches.group("oB")))), tuple(map(float, (reMatches.group("pR"), reMatches.group("pG"), reMatches.group("pB")))))
 
-def appendCCXML(buf, ccID, slope, offset, power, sat):
-    buf.append('\t<ColorCorrection id="%s">' % ccID)
-    buf.append('\t\t<SOPNode>')
-    buf.append('\t\t\t<Slope>%.05f %.05f %.05f</Slope>' % slope)
-    buf.append('\t\t\t<Offset>%.05f %.05f %.05f</Offset>' % offset)
-    buf.append('\t\t\t<Power>%.05f %.05f %.05f</Power>' % power)
-    buf.append('\t\t</SOPNode>')
-    buf.append('\t\t<SatNode>')
-    buf.append('\t\t\t<Saturation>%.05f</Saturation>' % sat)
-    buf.append('\t\t</SatNode>')
-    buf.append('\t</ColorCorrection>')
+def appendCCXML(ccID, slope, offset, power, sat, rootElement = None):
+    if rootElement is not None:
+        ccElement = SubElement(rootElement, 'ColorCorrection', {'id': ccID})
+    else:
+        ccElement = Element('ColorCorrection', {'id': ccID})
+
+    sopElement = SubElement(ccElement, 'SOPNode')
+    slopeElement = SubElement(sopElement, 'Slope')
+    slopeElement.text = "%.05f %.05f %.05f" % slope
+    offsetElement = SubElement(sopElement, 'Offset')
+    offsetElement.text = "%.05f %.05f %.05f" % offset
+    powerElement = SubElement(sopElement, 'Power')
+    powerElement.text = "%.05f %.05f %.05f" % power
+    satElement = SubElement(ccElement, 'SatNode')
+    saturationElement = SubElement(satElement, 'Saturation')
+    saturationElement.text = "%.05f" % sat
+
+    return ccElement
 
 def main(argv):
     args = getArgs()
@@ -98,6 +107,8 @@ def main(argv):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 pass
+            else:
+                raise
 
     cdl1re = re.compile(r"\*\s?ASC[_]SOP\s+[(]\s?(?P<sR>[-]?\d+[.]\d{4,6})\s+(?P<sG>[-]?\d+[.]\d{4,6})\s+(?P<sB>[-]?\d+[.]\d{4,6})\s?[)]\s?[(]\s?(?P<oR>[-]?\d+[.]\d{4,6})\s+(?P<oG>[-]?\d+[.]\d{4,6})\s+(?P<oB>[-]?\d+[.]\d{4,6})\s?[)]\s?[(]\s?(?P<pR>[-]?\d+[.]\d{4,6})\s+(?P<pG>[-]?\d+[.]\d{4,6})\s+(?P<pB>[-]?\d+[.]\d{4,6})\s?[)]")
     cdl2re = re.compile(r"\*\s?ASC[_]SAT\s+(?P<sat>\d+[.]\d{4,6})")
@@ -205,16 +216,14 @@ def main(argv):
     print " * %d Color Decision(s) found in EDL file \"%s\"." % (len(CCC), os.path.split(edlInput.name)[1])
 
     if args.format == 'ccc':
-        cccOut = open(output, 'w')
-        outputBuffer = [
-            '<?xml version="1.0" encoding="UTF-8"?>',
-            '<ColorCorrectionCollection xmlns="urn:ASC:CDL:v1.01">'
-        ]
+        root = Element('ColorCorrectionCollection', {'xmlns': 'urn:ASC:CDL:v1.01'})
+
         for cc in CCC:
-            appendCCXML(outputBuffer, cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'])
-        outputBuffer.append('</ColorCorrectionCollection>')
-        cccOut.write('\n'.join(outputBuffer))
-        cccOut.close()
+            appendCCXML(cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'], root)
+        
+        with open(output, 'w') as cccOut:
+            cccOut.write(prettify(root))
+
         print " * %d CDL(s) written in CCC file \"%s\"" % (len(CCC), os.path.split(output)[1])
 
     return
