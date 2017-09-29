@@ -105,7 +105,7 @@ def main(argv):
         try:
             os.mkdir(output)
         except OSError as e:
-            if e.errno != errno.EEXIST:
+            if e.errno == errno.EEXIST:
                 pass
             else:
                 raise
@@ -220,11 +220,22 @@ def main(argv):
 
         for cc in CCC:
             appendCCXML(cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'], root)
-        
+
         with open(output, 'w') as cccOut:
             cccOut.write(prettify(root))
 
         print " * %d CDL(s) written in CCC file \"%s\"" % (len(CCC), os.path.split(output)[1])
+    else:
+        for cc in CCC:
+            if args.format == 'cdl':
+                root = Element('ColorDecisionList', {'xmlns': 'urn:ASC:CDL:v1.01'})
+                appendCCXML(cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'], root)
+            else:
+                root = appendCCXML(cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'], None)
+
+            with open(os.path.join(output, "%s.%s" % (cc['id'], args.format)), 'w') as outputFile:
+                outputFile.write(prettify(root))
+        print " * %d individual %s(s) written in folder \"%s\"." % (len(CCC), args.format, output)
 
     return
     useCCC = "CDL"
