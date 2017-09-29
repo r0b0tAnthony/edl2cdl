@@ -52,14 +52,14 @@ def getArgs():
     parser.add_argument(
         '-f',
         '--format',
-        help="Choose between cdl(Color Decision List), cc(Color Correction), ccc(Color Correction Collection). cdl and cc REQUIRE your output to be a folder. ccc is a file.",
+        help="Choose between cdl(Color Decision List), cc(Color Correction), ccc(Color Correction Collection). cdl and cc REQUIRE your output to be a folder. ccc is a file. DEFAULT is cdl.",
         default='cdl',
         choices=['cdl', 'cc', 'ccc']
     )
     parser.add_argument(
         '-e',
         '--event',
-        help='Choose between "clip" for "FROM CLIP NAME" or "loc" for Locator Notes defining an edit event. Results in file name for cdl and cc formats.',
+        help='Choose between "clip" for "FROM CLIP NAME" or "loc" for Locator Notes defining an edit event. Results in file name for cdl and cc formats. DEFAULT is clip.',
         default='clip',
         choices=['clip', 'loc']
     )
