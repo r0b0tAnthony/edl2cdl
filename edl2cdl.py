@@ -102,6 +102,8 @@ def main(argv):
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
     else:
+        if os.path.splitext(output)[1]:
+            raise ValueError('The Output(-o) must be a folder when using the format(-f) "cc" or "cdl".')
         try:
             os.mkdir(output)
         except OSError as e:
