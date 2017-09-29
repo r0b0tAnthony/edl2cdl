@@ -2,28 +2,41 @@
 
 This tool is for converting color-correction metadata for advanced theatrical/television workflows, as it relates to a conversion tool for the [ASC **C**olor **D**ecision **L**ist](https://en.wikipedia.org/wiki/ASC_CDL) (*CDL*) metadata: the Academy Award® Technological Achievement winning invention by the [American Society of Cinematography](http://www.theasc.com) (ASC) [Science and Technology Committee](http://www.theasc.com/clubhouse/committee_tech.html) for representation and transportation of cinematographic-quality “color *grading*” information ― from on-set to postproduction. More information at the bottom of the present document.
 
-**`edl2cdl`** reads the CDL metadata embedded, as comments, in the editing events of a CMX3600-like [Edit Decision List](https://en.wikipedia.org/wiki/Edit_decision_list) file (EDL). Every CDL is named after and  differentiated by an identifier called “CCCid” that is read after each EDL event's `ClipName` *comment*-field (so be sure to include it as comment in your EDL). The tool then converts the CDL metadata into either one of three XML-based variants of the ASC CDL file formats:
-* A single Color Correction Collection file (*CCC*, `.ccc` file extension) containing all the color decisions in the original EDL. This is also the default output format of **`edl2cdl`**.
-* A series of Color Decision List files, each containing SOP+saturation metadata for one individual color decision (*CDL*, `.cdl` file extension).
+**`edl2cdl`** reads the CDL metadata embedded, as comments, in the editing events of a CMX3600-like [Edit Decision List](https://en.wikipedia.org/wiki/Edit_decision_list) file (EDL). Every CDL is named after and  differentiated by an identifier called “CCCid” that is read after each EDL event's `ClipName` or `Locator` *comment*-field (so be sure to include it as comment in your EDL). The tool then converts the CDL metadata into either one of three XML-based variants of the ASC CDL file formats:
+* A series of Color Decision List files, each containing SOP+saturation metadata for one individual color decision (*CDL*, `.cdl` file extension). This is also the default output format of **`edl2cdl`**.
+* A single Color Correction Collection file (*CCC*, `.ccc` file extension) containing all the color decisions in the original EDL.
 * A series of Color Correction files, each containing SOP+saturation metadata for one individual color decision (*CC*, `.cc` file extension). *This is not really a standard ASC CDL file format, but is effectively what is supported by many software applications with lighter implementations of CDL* (e.g. The Foundry *Nuke* ).
 
-Since the original ClipName name is transformed into a CCCid and the on-set color-correction usually includes just one version/grade per clip shot, no multiple CDLs are extracted from a single ClipName/TapeName.
-The only parameter that can be passed is either `--ccc` (*default* if not explicitly defined) or `--cdl` or `--cc` to specify the corresponding output format. Other than that a first mandatory argument is the pathname of the input EDL file. Optionally a foldername or a filename can be specified as argument (the script intelligently parses the output pathname guessing its use according to different output format). Individual EDL/CC files are generated in a separate folder (that keeps the EDL name, without extension, by default); the single CCC file is by default generated in the same folder (and with the same name) of the EDL file.
+Since the original `ClipName` or `Locator` name is transformed into a CCCid and the on-set color-correction usually includes just one version/grade per clip shot, no multiple CDLs are extracted from a single ClipName/TapeName.
 
 ## Usage
 
+### To Create Individual CDL Files
+`python edl2cdl.py -i file.edl -o path/to/folder`
+
+This will name each CDL file after the corresponding edit event in the EDL.
+
 ### To Create A Color Correction Collection, a group of CCs in a single file.
 
-`python edl2cdl.py file.edl path/to/file.ccc`
+`python edl2cdl.py -i file.edl -o path/to/file.ccc -f ccc`
 
 ### To Create Individual CC Files
 
-`python edl2cdl.py file.edl path/to/folder --cc`
+`python edl2cdl.py -i file.edl -o path/to/folder -f cc`
 
-This will name each CC file after the corresponding Clip Name in the EDL.
+This will name each CC file after the corresponding edit event in the EDL.
 
-### To Create Individual CDL Files
-`python edl2cdl.py file.edl path/to/folder --cdl`
+### Change Edit Event Marker
+By default edl2cdl uses **FROM CLIP NAME** comment to determine edit events. edl2cdl also supports using **Locator/LOC** comment as edit events. To use **LOC** as an edit event pass `-e loc` along with the rest of the command.
+
+`python edl2cdl.py -i file.edl -o path/to/folder -e loc`
+
+### Need Help
+To get all available options and flags for edl2cdl use the help(`-h`) flag.
+
+`python edl2cdl.py -h`
+
+
 
 ## Details on ASC CDL
 Each “color decision”, i.e. a so-called “primary” color grading operator mimicking 35mm film color-timing and telecine operations and affecting the whole frame or sequence of frames, is represented by a 10-tuple of floating point values divided in 3+3+3+1 numbers: (*s*R, *s*G, *s*B), (*o*R, *o*G, *o*B), (*p*R, *p*G, *p*B) and *S*.
