@@ -64,6 +64,10 @@ def getArgs():
 
     return parser.parse_args()
 
+def cdl1Parse(reMatches):
+    return (tuple(map(float, (reMatches.group("sR"), reMatches.group("sG"), reMatches.group("sB")))), tuple(map(float, (reMatches.group(
+        "oR"), reMatches.group("oG"), reMatches.group("oB")))), tuple(map(float, (reMatches.group("pR"), reMatches.group("pG"), reMatches.group("pB")))))
+
 def main(argv):
     args = getArgs()
 
@@ -143,8 +147,7 @@ def main(argv):
                     tapename, CDLevent = None, False
             elif CDLevent and cdl1re.match(line):
                 L = cdl1re.match(line)
-                thisCDL = (tuple(map(float, (L.group("sR"), L.group("sG"), L.group("sB")))), tuple(map(float, (L.group(
-                    "oR"), L.group("oG"), L.group("oB")))), tuple(map(float, (L.group("pR"), L.group("pG"), L.group("pB")))))
+                thisCDL = cdl1Parse(L)
                 thisSAT = 0
             elif CDLevent and thisCDL and cdl2re.match(line):
                 L = cdl2re.match(line)
@@ -152,10 +155,33 @@ def main(argv):
                 writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
                 tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
     else:
+        locRE = re.compile(r'\*\s?LOC:\s+\d\d:\d\d:\d\d:\d\d\s+\w*\s+(?P<name>.*)')
         for line in edlInput.readlines():
             line = line.strip()
             if line[0] != '*':
                 continue
+            matchLoc = locRE.match(line)
+            if matchLoc:
+                CDLevent = True
+                if thisCDL:
+                    writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
+                    thisCDL, thisSAT = None, 0
+                tapename = matchLoc.group('name')
+                if tapename in IDs:
+                    tapename, CDLEvent = None, False
+                continue
+            matchCdl1 = cdl1re.match(line)
+            if CDLevent and matchCdl1:
+                thisCDL = cdl1Parse(matchCdl1)
+                thisSAT = 0
+                continue
+            matchCdl2 = cdl2re.match(line)
+            if CDLevent and matchCdl2:
+                thisSAT = float(matchCdl2.group('sat'))
+                writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
+                tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
+                continue
+
     from pprint import pprint
     pprint(CCC)
 
