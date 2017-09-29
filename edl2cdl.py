@@ -181,6 +181,9 @@ def main(argv):
                 writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
                 tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
                 continue
+    if thisCDL:
+        writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
+        tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
 
     edlInput.close()
     from pprint import pprint
