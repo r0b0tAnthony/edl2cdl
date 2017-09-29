@@ -68,6 +68,18 @@ def cdl1Parse(reMatches):
     return (tuple(map(float, (reMatches.group("sR"), reMatches.group("sG"), reMatches.group("sB")))), tuple(map(float, (reMatches.group(
         "oR"), reMatches.group("oG"), reMatches.group("oB")))), tuple(map(float, (reMatches.group("pR"), reMatches.group("pG"), reMatches.group("pB")))))
 
+def appendCCXML(buf, ccID, slope, offset, power, sat):
+    buf.append('\t<ColorCorrection id="%s">' % ccID)
+    buf.append('\t\t<SOPNode>')
+    buf.append('\t\t\t<Slope>%.05f %.05f %.05f</Slope>' % slope)
+    buf.append('\t\t\t<Offset>%.05f %.05f %.05f</Offset>' % offset)
+    buf.append('\t\t\t<Power>%.05f %.05f %.05f</Power>' % power)
+    buf.append('\t\t</SOPNode>')
+    buf.append('\t\t<SatNode>')
+    buf.append('\t\t\t<Saturation>%.05f</Saturation>' % sat)
+    buf.append('\t\t</SatNode>')
+    buf.append('\t</ColorCorrection>')
+
 def main(argv):
     args = getArgs()
 
@@ -75,9 +87,9 @@ def main(argv):
     edlInput = args.input
 
     if args.format == 'ccc':
-        if output[:3] != 'ccc':
+        if output[-3:] != 'ccc':
             raise ValueError('The Output(-o) must be a file that ends in ".ccc" when using the format(-f) "ccc".')
-        output_path = os.path.split()[0]
+        output_path = os.path.split(output)[0]
         if not os.path.isdir(output_path):
             os.mkdir(output_path)
     else:
@@ -186,8 +198,24 @@ def main(argv):
         tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
 
     edlInput.close()
-    from pprint import pprint
-    pprint(CCC)
+
+    if not CCC:
+        print "No Color Decision(s) found in EDL file \"%s\". Quitting." % os.path.split(edlInput.name)[1]
+        sys.exit(0)
+    print " * %d Color Decision(s) found in EDL file \"%s\"." % (len(CCC), os.path.split(edlInput.name)[1])
+
+    if args.format == 'ccc':
+        cccOut = open(output, 'w')
+        outputBuffer = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<ColorCorrectionCollection xmlns="urn:ASC:CDL:v1.01">'
+        ]
+        for cc in CCC:
+            appendCCXML(outputBuffer, cc['id'], cc['slope'], cc['offset'], cc['power'], cc['SAT'])
+        outputBuffer.append('</ColorCorrectionCollection>')
+        cccOut.write('\n'.join(outputBuffer))
+        cccOut.close()
+        print " * %d CDL(s) written in CCC file \"%s\"" % (len(CCC), os.path.split(output)[1])
 
     return
     useCCC = "CDL"
