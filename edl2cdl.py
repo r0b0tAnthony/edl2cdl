@@ -168,7 +168,7 @@ def main(argv):
                     thisCDL, thisSAT = None, 0
                 tapename = matchLoc.group('name')
                 if tapename in IDs:
-                    tapename, CDLEvent = None, False
+                    tapename, CDLevent = None, False
                 continue
             matchCdl1 = cdl1re.match(line)
             if CDLevent and matchCdl1:
