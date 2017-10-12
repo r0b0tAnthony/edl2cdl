@@ -130,6 +130,7 @@ def main():
         lenEdlLines = len(edlLines)
         for n in range(lenEdlLines):
             line = edlLines[n].strip()
+            # Skip all lines that aren't EDL Comments/Notes
             if line[0] != '*':
                 continue
             if camre.match(line):
@@ -180,9 +181,11 @@ def main():
                 writeCDL(CCC, IDs, tapename, thisCDL, thisSAT)
                 tapename, CDLevent, thisCDL, thisSAT = None, False, None, 0
     else:
+        #Find Locator 
         locRE = re.compile(r'\*\s?LOC:\s+\d\d:\d\d:\d\d:\d\d\s+\w*\s+(?P<name>.*)')
         for line in edlInput.readlines():
             line = line.strip()
+            # Skip all lines that aren't EDL Comments/Notes
             if line[0] != '*':
                 continue
             matchLoc = locRE.match(line)
