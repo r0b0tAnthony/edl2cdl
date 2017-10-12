@@ -19,7 +19,7 @@
 ##                                              ##
 ##################################################
 #!/usr/bin/env python
-_version = "2.0"
+_version = "2.1"
 import os,re, sys, argparse, errno
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from ElementTree_pretty import prettify
