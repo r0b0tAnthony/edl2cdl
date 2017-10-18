@@ -19,7 +19,7 @@
 ##                                              ##
 ##################################################
 #!/usr/bin/env python
-_version = "2.1"
+_version = "2.1.1"
 import os,re, sys, argparse, errno
 from xml.etree.ElementTree import Element, SubElement, Comment, tostring
 from ElementTree_pretty import prettify
@@ -113,7 +113,7 @@ def main():
                 raise
 
     cdl1re = re.compile(r"\*\s?ASC[_]SOP\s+[(]\s?(?P<sR>[-]?\d+[.]\d{4,6})\s+(?P<sG>[-]?\d+[.]\d{4,6})\s+(?P<sB>[-]?\d+[.]\d{4,6})\s?[)]\s?[(]\s?(?P<oR>[-]?\d+[.]\d{4,6})\s+(?P<oG>[-]?\d+[.]\d{4,6})\s+(?P<oB>[-]?\d+[.]\d{4,6})\s?[)]\s?[(]\s?(?P<pR>[-]?\d+[.]\d{4,6})\s+(?P<pG>[-]?\d+[.]\d{4,6})\s+(?P<pB>[-]?\d+[.]\d{4,6})\s?[)]")
-    cdl2re = re.compile(r"\*\s?ASC[_]SAT\s+(?P<sat>\d+[.]\d{4,6})")
+    cdl2re = re.compile(r"\*\s?ASC[_]SAT\s+(?P<sat>\d+([.]\d{4,6})?)")
     CDLevent = False
     thisCDL = None
     IDs = []
